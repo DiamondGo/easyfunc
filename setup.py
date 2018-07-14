@@ -3,7 +3,7 @@ from distutils.core import setup
 setup(
     name = 'easyfunc',
     packages = ['easyfunc'],
-    version = '0.1',  # Ideally should be same as your GitHub release tag varsion
+    version = '0.1',
     description = 'Easy and simple functional programming style helper for python.',
     author = 'Key',
     author_email = 'orangewar@hotmail.com',

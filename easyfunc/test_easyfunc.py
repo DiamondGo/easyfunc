@@ -1,9 +1,9 @@
 import unittest
 
-from func import pyver
-from func import Optional
-from func import Stream
-from func import iterable
+from easyfunc import pyver
+from easyfunc import Optional
+from easyfunc import Stream
+from easyfunc import iterable
 
 
 class TestFunc(unittest.TestCase):
