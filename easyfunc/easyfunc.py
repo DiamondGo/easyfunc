@@ -81,7 +81,7 @@ class Stream:
         return Stream([])
 
     @classmethod
-    def infinite(cls, start=0, step=1):
+    def number(cls, start=0, step=1):
         def gen():
             i = start
             while True:
