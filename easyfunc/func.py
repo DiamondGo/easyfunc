@@ -55,10 +55,13 @@ class Stream:
         return self
 
     def __next__(self):
-        if pyver == "3":
-            return self.__inner_iter.__next__()
-        elif pyver == "2":
-            return self.__inner_iter.next()
+        return {"3": self.__next__py3, "2": self.__next__py2}[pyver]()
+
+    def __next__py2(self):
+        return self.__inner_iter.next()
+
+    def __next__py3(self):
+        return self.__inner_iter.__next__()
 
     def next(self):
         return self.__next__()
