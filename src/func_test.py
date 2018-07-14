@@ -59,8 +59,9 @@ class TestFunc(unittest.TestCase):
         return sum(1 for _ in iter)
 
     def testStreamBasic(self):
-        s = Stream.of([1,2,3,4])
-        self.assertEqual(4, self.countIter(s))
+        l = Stream.of(1,2,3,4).tolist()
+        self.assertEqual(4, self.countIter(l))
+        self.assertEqual(3, l[2])
 
     def testInfinite(self):
         s = Stream.infinite(step=2)
@@ -114,6 +115,16 @@ class TestFunc(unittest.TestCase):
         self.assertEqual(9, len(l))
         self.assertEqual(8, l[-1])
 
+    def testAppend(self):
+        l = Stream.infinite().take(4).append(99, 100, 101).tolist()
+        self.assertEqual(7, len(l))
+        self.assertEqual(101, l[-1])
+
+    def testprepend(self):
+        l = Stream.infinite().take(4).prepend(99, 100, 101).tolist()
+        self.assertEqual(7, len(l))
+        self.assertEqual(1, l[-3])
+        self.assertEqual(99, l[0])
 
 
 

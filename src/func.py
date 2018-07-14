@@ -67,8 +67,11 @@ class Stream:
         return list(self)
 
     @classmethod
-    def of(cls, it):
-        return Stream(it)
+    def of(cls, *value):
+        def gen():
+            for item in value:
+                yield item
+        return cls(gen())
 
     @classmethod
     def empty(cls):
@@ -136,11 +139,17 @@ class Stream:
         return Optional.empty()
 
     @classmethod
-    def concat(cls, *args):
-        return cls.of(chain(*args))
+    def concat(cls, *streams):
+        return cls(chain(*streams))
 
-    def extend(self, *args):
-        return Stream.concat(self, *args)
+    def extend(self, *streams):
+        return Stream.concat(self, *streams)
+
+    def append(self, *items):
+        return self.extend(Stream.of(*items))
+
+    def prepend(self, *items):
+        return Stream.of(*items).extend(self)
 
 
 
