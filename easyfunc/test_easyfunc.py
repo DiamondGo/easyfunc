@@ -64,64 +64,64 @@ class TestFunc(unittest.TestCase):
         self.assertEqual(3, l[2])
 
     def testInfinite(self):
-        s = Stream.infinite(step=2)
+        s = Stream.number(step=2)
         for i in range(100):
             self.assertEqual(i*2, s.next())
 
     def testTake(self):
-        s = Stream.infinite(step=2)
+        s = Stream.number(step=2)
         self.assertEqual(4, self.countIter(s.take(4)))
         self.assertEqual(0, self.countIter(s.take(0)))
 
     def testTakeWhile(self):
-        self.assertEqual(8, self.countIter(Stream.infinite(step=2).takeWhile(lambda i: i < 15)))
-        self.assertEqual(14, max(Stream.infinite(step=2).takeWhile(lambda i: i < 15)))
-        self.assertEqual(0, max(Stream.infinite(step=2).takeWhile(lambda i: i < 1)))
+        self.assertEqual(8, self.countIter(Stream.number(step=2).takeWhile(lambda i: i < 15)))
+        self.assertEqual(14, max(Stream.number(step=2).takeWhile(lambda i: i < 15)))
+        self.assertEqual(0, max(Stream.number(step=2).takeWhile(lambda i: i < 1)))
 
     def testFilter(self):
-        self.assertEqual(12, sum(Stream.infinite().filter(lambda i: i % 2 == 0).take(4)))
+        self.assertEqual(12, sum(Stream.number().filter(lambda i: i % 2 == 0).take(4)))
 
     def testTolist(self):
-        self.assertEqual([1,3,5], Stream.infinite(start=1, step=2).take(3).tolist())
+        self.assertEqual([1,3,5], Stream.number(start=1, step=2).take(3).tolist())
 
     def testMap(self):
-        self.assertEqual(16, max(Stream.infinite().map(lambda x: x**2).take(5)));
+        self.assertEqual(16, max(Stream.number().map(lambda x: x ** 2).take(5)));
 
     def testForeach(self):
         count = {"count":0}
         def addCount(x):
             count["count"] += x
-        Stream.infinite().map(lambda x: x**2).filter(lambda x: x % 3 == 0).take(3).foreach(lambda x: addCount(x))
+        Stream.number().map(lambda x: x ** 2).filter(lambda x: x % 3 == 0).take(3).foreach(lambda x: addCount(x))
         self.assertEqual(45, count["count"])
 
     def testAnyAll(self):
-        self.assertFalse(Stream.infinite(step=2).take(10).any(lambda x: x % 2 != 0))
-        self.assertTrue(Stream.infinite(step=2).take(10).all(lambda x: x % 2 == 0))
+        self.assertFalse(Stream.number(step=2).take(10).any(lambda x: x % 2 != 0))
+        self.assertTrue(Stream.number(step=2).take(10).all(lambda x: x % 2 == 0))
         self.assertFalse(Stream.empty().any(lambda x: x > 0))
         self.assertTrue(Stream.empty().all(lambda x: x > 0))
 
     def testConcat(self):
-        l = Stream.concat(Stream.infinite().filter(lambda i: i % 3 == 0).take(3),
-                          Stream.infinite().filter(lambda i: i % 3 == 1).take(3),
-                          Stream.infinite().filter(lambda i: i % 3 == 2).take(3)).tolist()
+        l = Stream.concat(Stream.number().filter(lambda i: i % 3 == 0).take(3),
+                          Stream.number().filter(lambda i: i % 3 == 1).take(3),
+                          Stream.number().filter(lambda i: i % 3 == 2).take(3)).tolist()
         self.assertEqual(9, len(l))
         self.assertEqual(8, l[-1])
 
     def testExtend(self):
-        s = Stream.infinite().filter(lambda i: i % 3 == 0).take(3).extend(
-            Stream.infinite().filter(lambda i: i % 3 == 1).take(3),
-            Stream.infinite().filter(lambda i: i % 3 == 2).take(3))
+        s = Stream.number().filter(lambda i: i % 3 == 0).take(3).extend(
+            Stream.number().filter(lambda i: i % 3 == 1).take(3),
+            Stream.number().filter(lambda i: i % 3 == 2).take(3))
         l = s.tolist()
         self.assertEqual(9, len(l))
         self.assertEqual(8, l[-1])
 
     def testAppend(self):
-        l = Stream.infinite().take(4).append(99, 100, 101).tolist()
+        l = Stream.number().take(4).append(99, 100, 101).tolist()
         self.assertEqual(7, len(l))
         self.assertEqual(101, l[-1])
 
     def testprepend(self):
-        l = Stream.infinite().take(4).prepend(99, 100, 101).tolist()
+        l = Stream.number().take(4).prepend(99, 100, 101).tolist()
         self.assertEqual(7, len(l))
         self.assertEqual(1, l[-3])
         self.assertEqual(99, l[0])
