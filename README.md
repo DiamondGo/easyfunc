@@ -1,4 +1,4 @@
-Tools for functional programming style in python.
+Easy and simple for functional programming style in python.
 
 See tests for examples.
 
