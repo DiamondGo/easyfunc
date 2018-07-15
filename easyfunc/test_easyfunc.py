@@ -107,6 +107,9 @@ class TestFunc(unittest.TestCase):
                           Stream.number().filter(lambda i: i % 3 == 2).take(3)).to_list()
         self.assertEqual(9, len(l))
         self.assertEqual(8, l[-1])
+        l = Stream.concat(Stream.number().filter(lambda i: i % 3 == 0).take(3),
+                          range(3)).to_list()
+        self.assertEqual(6, len(l))
 
     def testExtend(self):
         s = Stream.number().filter(lambda i: i % 3 == 0).take(3).extend(
