@@ -38,13 +38,13 @@ class TestFunc(unittest.TestCase):
     def testOptional(self):
         empty = Optional.empty()
         self.assertRaises(RuntimeError, empty.get)
-        self.assertEqual(3, empty.orElse(3))
-        self.assertEqual(3, empty.orElseGet(lambda: 3))
+        self.assertEqual(3, empty.or_else(3))
+        self.assertEqual(3, empty.or_else_get(lambda: 3))
 
         some = Optional.of("hello")
         self.assertEqual("hello", some.get())
-        self.assertEqual("hello", some.orElse("world"))
-        self.assertEqual("hello", some.orElseGet(lambda: 3))
+        self.assertEqual("hello", some.or_else("world"))
+        self.assertEqual("hello", some.or_else_get(lambda: 3))
 
     def testIterator(self):
         l = range(3)
@@ -59,7 +59,7 @@ class TestFunc(unittest.TestCase):
         return sum(1 for _ in iter)
 
     def testStreamBasic(self):
-        l = Stream.of(1,2,3,4).tolist()
+        l = Stream.of(1,2,3,4).to_list()
         self.assertEqual(4, self.countIter(l))
         self.assertEqual(3, l[2])
 
@@ -72,17 +72,18 @@ class TestFunc(unittest.TestCase):
         s = Stream.number(step=2)
         self.assertEqual(4, self.countIter(s.take(4)))
         self.assertEqual(0, self.countIter(s.take(0)))
+        self.assertEqual(3, self.countIter(s.take(3).take(4)))
 
     def testTakeWhile(self):
-        self.assertEqual(8, self.countIter(Stream.number(step=2).takeWhile(lambda i: i < 15)))
-        self.assertEqual(14, max(Stream.number(step=2).takeWhile(lambda i: i < 15)))
-        self.assertEqual(0, max(Stream.number(step=2).takeWhile(lambda i: i < 1)))
+        self.assertEqual(8, self.countIter(Stream.number(step=2).take_while(lambda i: i < 15)))
+        self.assertEqual(14, max(Stream.number(step=2).take_while(lambda i: i < 15)))
+        self.assertEqual(0, max(Stream.number(step=2).take_while(lambda i: i < 1)))
 
     def testFilter(self):
         self.assertEqual(12, sum(Stream.number().filter(lambda i: i % 2 == 0).take(4)))
 
     def testTolist(self):
-        self.assertEqual([1,3,5], Stream.number(start=1, step=2).take(3).tolist())
+        self.assertEqual([1,3,5], Stream.number(start=1, step=2).take(3).to_list())
 
     def testMap(self):
         self.assertEqual(16, max(Stream.number().map(lambda x: x ** 2).take(5)));
@@ -103,7 +104,7 @@ class TestFunc(unittest.TestCase):
     def testConcat(self):
         l = Stream.concat(Stream.number().filter(lambda i: i % 3 == 0).take(3),
                           Stream.number().filter(lambda i: i % 3 == 1).take(3),
-                          Stream.number().filter(lambda i: i % 3 == 2).take(3)).tolist()
+                          Stream.number().filter(lambda i: i % 3 == 2).take(3)).to_list()
         self.assertEqual(9, len(l))
         self.assertEqual(8, l[-1])
 
@@ -111,22 +112,44 @@ class TestFunc(unittest.TestCase):
         s = Stream.number().filter(lambda i: i % 3 == 0).take(3).extend(
             Stream.number().filter(lambda i: i % 3 == 1).take(3),
             Stream.number().filter(lambda i: i % 3 == 2).take(3))
-        l = s.tolist()
+        l = s.to_list()
         self.assertEqual(9, len(l))
         self.assertEqual(8, l[-1])
 
     def testAppend(self):
-        l = Stream.number().take(4).append(99, 100, 101).tolist()
+        l = Stream.number().take(4).append(99, 100, 101).to_list()
         self.assertEqual(7, len(l))
         self.assertEqual(101, l[-1])
 
     def testprepend(self):
-        l = Stream.number().take(4).prepend(99, 100, 101).tolist()
+        l = Stream.number().take(4).prepend(99, 100, 101).to_list()
         self.assertEqual(7, len(l))
         self.assertEqual(1, l[-3])
         self.assertEqual(99, l[0])
 
+    def testFlat(self):
+        l = Stream.number(step=3).map(lambda x: (x, x+1, x+2)).flat().take(10).to_list()
+        self.assertEqual(45, sum(l))
 
+    def testNextItem(self):
+        self.assertEqual(3, Stream.number(start=3).next_item().get())
+        self.assertEqual(100, Stream.empty().next_item().or_else(100))
+
+    def testFold(self):
+        self.assertEqual(45, Stream.number().take(10).fold(lambda x, y: x+y, 0))
+        self.assertEqual("01234", Stream.number().take(5).fold(lambda x, y: x+str(y), ""))
+
+        self.assertTrue(45, Stream.number().take(10).sum())
+        self.assertEqual("01234", Stream.number().take(5).map(lambda i: str(i)).join(""))
+
+    def testZip(self):
+        l = Stream.zip(range(5), Stream.number(start=4, step=-1).take(8)).to_list()
+        self.assertEqual(5, len(l))
+        self.assertTrue(Stream(l).map(lambda tup: tup[0] + tup[1]).all(lambda x: x == 4))
+
+        l = Stream.number(start=4, step=-1).take(8).zip_with(range(5)).to_list()
+        self.assertEqual(5, len(l))
+        self.assertTrue(Stream(l).map(lambda tup: tup[0] + tup[1]).all(lambda x: x == 4))
 
 
 if __name__ == '__main__':
