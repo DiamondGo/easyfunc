@@ -1,5 +1,12 @@
 import sys
 from itertools import chain
+
+# zip
+try:
+    from itertools import izip as zip
+except ImportError: # will be 3.x series
+    pass
+
 pyver = {
     (2, 6): "2",
     (2, 7): "2",
@@ -28,13 +35,13 @@ class Optional:
             raise RuntimeError("Optional is empty")
         return self.__val
 
-    def orElse(self, elseVal):
+    def or_else(self, elseVal):
         return self.__val if not self.__empty else elseVal
 
-    def ifPresent(self, elseVal):
+    def if_present(self, elseVal):
         return not self.__empty
 
-    def orElseGet(self, supplier):
+    def or_else_get(self, supplier):
         return self.__val if not self.__empty else supplier()
 
     @classmethod
@@ -66,7 +73,13 @@ class Stream:
     def next(self):
         return self.__next__()
 
-    def tolist(self):
+    def next_item(self):
+        try:
+            return Optional.of(self.next())
+        except StopIteration:
+            return Optional.empty()
+
+    def to_list(self):
         return list(self)
 
     @classmethod
@@ -93,11 +106,14 @@ class Stream:
         def gen():
             taken = 0
             while taken < count:
-                yield self.next()
+                try:
+                    yield self.next()
+                except StopIteration:
+                    return
                 taken = taken + 1
         return Stream(gen())
 
-    def takeWhile(self, predictor):
+    def take_while(self, predictor):
         def gen():
             for item in self:
                 if predictor(item):
@@ -135,7 +151,7 @@ class Stream:
                 return False
         return True
 
-    def findFirst(self, predictor):
+    def find_first(self, predictor):
         for item in self:
             if predictor(item):
                 return Optional.of(item)
@@ -154,7 +170,32 @@ class Stream:
     def prepend(self, *items):
         return Stream.of(*items).extend(self)
 
+    def flat(self):
+        def gen():
+            for item in self:
+                for subitem in Stream(item):
+                    yield subitem
+        return Stream(gen())
 
+    def fold(self, func, initial):
+        cur = initial
+        for item in self:
+            cur = func(cur, item)
+        return cur
 
+    def sum(self):
+        return self.fold(lambda x, y: x + y, 0)
 
+    def join(self, sep):
+        return sep.join(self)
+
+    @classmethod
+    def zip(cls, it1, it2):
+        def gen():
+            for i1, i2 in zip(it1, it2):
+                yield i1, i2
+        return cls(gen())
+
+    def zip_with(self, it):
+        return Stream.zip(self, it)
 
