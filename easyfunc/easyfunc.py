@@ -85,6 +85,9 @@ class Stream:
     def to_list(self):
         return list(self)
 
+    def to_map(self, key=(lambda x: x[0]), value=(lambda y: y[1])):
+        return { key(i) : value(i) for i in self }
+
     @classmethod
     def of(cls, *value):
         def gen():
