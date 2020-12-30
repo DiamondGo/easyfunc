@@ -85,8 +85,20 @@ class TestFunc(unittest.TestCase):
     def testTolist(self):
         self.assertEqual([1,3,5], Stream.number(start=1, step=2).take(3).to_list())
 
+    def testToMap(self):
+        m = Stream.zip(range(5), Stream.number(start=4, step=-1).take(3)).to_map()
+        self.assertEqual(3, len(m))
+        self.assertEqual(4, m[0])
+        self.assertEqual(3, m[1])
+        self.assertEqual(2, m[2])
+        
+        m = Stream.number().take(3).to_map(key=lambda it:it, value=lambda it:it*2)
+        self.assertEqual(2, m[1])
+        self.assertEqual(4, m[2])
+        self.assertEqual(0, m[0])
+
     def testMap(self):
-        self.assertEqual(16, max(Stream.number().map(lambda x: x ** 2).take(5)));
+        self.assertEqual(16, max(Stream.number().map(lambda x: x ** 2).take(5)))
 
     def testForeach(self):
         count = {"count":0}

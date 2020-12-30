@@ -1,6 +1,6 @@
 # Simple functional programming style for python
 
-_Tested on python version *2.6*, *2.7*, *3.4*, *3.5*, *3.6*_
+_Tested on python version *2.6*, *2.7*, *3.x*
 
 This package provides an incomplete simulation of [LINQ](https://en.wikipedia.org/wiki/Language_Integrated_Query)/[Stream](https://docs.oracle.com/javase/8/docs/api/java/util/stream/Stream.html) style stream processing for python.
 
