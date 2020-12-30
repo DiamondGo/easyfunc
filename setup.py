@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="easyfunc",
-    version="0.2.3",
+    version="0.2.4",
     author="K",
     author_email="mastercoderk@gmail.com",
     description="Easy and simple functional programming style helper for python",
